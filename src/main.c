@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include <string.h>
+#include <math.h>
 
 #define COR_FUNDO       (Color){15, 10, 30, 255}
 #define COR_DOURADO     (Color){255, 200, 50, 255}
@@ -23,7 +24,7 @@ void DesenharLinhaDourada(int y, int margem) {
     DrawCircle(w - margem, y, 4, COR_DOURADO);
 }
 
-int DesenharBotao(const char *texto, int y, int selecionado, int hover) {
+int DesenharBotao(const char *texto, int y, int selecionado, int hover __attribute__((unused))) {
     int w = GetScreenWidth();
     int larguraBotao = 320;
     int alturaBotao  = 54;
@@ -111,7 +112,7 @@ int main(void) {
 
             for (int i = 0; i < TOTAL_OPCOES; i++) {
                 int y = yBase + i * espacamento;
-                int clicado = DesenharBotao(rotulos[i], y, selecao == i, 0);
+                int clicado = DesenharBotao(rotulos[i], y, selecao == (OpcaoMenu)i, 0);
                 if (clicado) {
                     if (i == OPCAO_JOGAR)   tela = TELA_JOGO;
                     if (i == OPCAO_RANKING) tela = TELA_RANKING;
