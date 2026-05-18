@@ -145,7 +145,82 @@ static void DesenharJogo(EstadoJogo *estado) {
     snprintf(buf, sizeof(buf), "COMBO x%d", estado->combo);
     DrawText(buf, 10, 44, 18, COR_BRANCO);
 
-    DesenharTextoCentralizado("ESC — voltar ao menu", 575, 13, COR_CINZA);
+    DesenharTextoCentralizado("ESC — pausar", 575, 13, COR_CINZA);
+}
+
+// ─── Overlay de Pausa ─────────────────────────────────────────────────────────
+// Retorna: -1 = nenhuma ação, 0 = continuar clicado, 1 = voltar ao menu clicado
+static int DesenharPausa(int selecao) {
+    int sw = GetScreenWidth();
+    int sh = GetScreenHeight();
+
+    DrawRectangle(0, 0, sw, sh, (Color){5, 3, 15, 190});
+
+    DesenharTextoCentralizado("PAUSADO", 180, 44, COR_DOURADO);
+    DesenharLinhaDourada(234, 200);
+
+    const char *opcoes[2] = {"  CONTINUAR  ", "  VOLTAR AO MENU  "};
+    int acao = -1;
+    for (int i = 0; i < 2; i++) {
+        if (DesenharBotao(opcoes[i], 270 + i * 70, selecao == i))
+            acao = i;
+    }
+
+    DesenharTextoCentralizado("SETAS + ENTER  |  ESC para continuar", 445, 13, COR_CINZA);
+    return acao;
+}
+
+// ─── Tela de Ranking ──────────────────────────────────────────────────────────
+static void DesenharRanking(EntradaRanking *ranking, int n) {
+    DesenharLinhaDourada(60, 60);
+    DesenharTextoCentralizado("RANKING", 72, 40, COR_DOURADO);
+    DesenharLinhaDourada(122, 60);
+
+    if (n == 0) {
+        DesenharTextoCentralizado("Nenhuma pontuacao registrada ainda.", 280, 20, COR_CINZA);
+    } else {
+        // Cores para o pódio
+        static Color medalha[3] = {
+            {255, 200, 50,  255},  // ouro
+            {200, 200, 210, 255},  // prata
+            {200, 120, 60,  255},  // bronze
+        };
+
+        int yInicio = 150;
+        int passo   = 40;
+
+        for (int i = 0; i < n; i++) {
+            Color cor = (i < 3) ? medalha[i] : COR_BRANCO;
+
+            // Fundo da linha para os 3 primeiros
+            if (i < 3) {
+                Rectangle fundo = {100, yInicio + i*passo - 6, 600, 34};
+                DrawRectangleRounded(fundo, 0.3f, 4,
+                                     (Color){cor.r, cor.g, cor.b, 25});
+                DrawRectangleRoundedLines(fundo, 0.3f, 4,
+                                          (Color){cor.r, cor.g, cor.b, 60});
+            }
+
+            // Posição
+            char pos[16];
+            snprintf(pos, sizeof(pos), "#%d", i + 1);
+            DrawText(pos, 130, yInicio + i*passo, 22, cor);
+
+            // Pontuação alinhada à direita
+            char pts[32];
+            snprintf(pts, sizeof(pts), "%d PTS", ranking[i].pontuacao);
+            int tw = MeasureText(pts, 22);
+            DrawText(pts, 670 - tw, yInicio + i*passo, 22, cor);
+
+            // Linha separadora sutil
+            if (i < n - 1)
+                DrawLine(130, yInicio + i*passo + 32,
+                         670, yInicio + i*passo + 32,
+                         (Color){60, 55, 80, 255});
+        }
+    }
+
+    DesenharTextoCentralizado("ESC — voltar ao menu", 560, 14, COR_CINZA);
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -154,6 +229,7 @@ int main(void) {
     const int ALTURA  = 600;
 
     InitWindow(LARGURA, ALTURA, "Baque Virado - Maracatu");
+    SetExitKey(KEY_NULL);
     SetTargetFPS(60);
 
     Texture2D fundo = LoadTexture("assets/fundo.png");
@@ -163,14 +239,21 @@ int main(void) {
     float     tempo   = 0.0f;
     int       yBase   = 310, espacamento = 68;
 
-    EstadoJogo jogo     = {0};
-    int        jogoVivo = 0;
+    EstadoJogo     jogo          = {0};
+    int            jogoVivo      = 0;
+    int            jogoEmPausa   = 0;
+    int            selecaoPausa  = 0;
+    EntradaRanking ranking[MAX_RANKING] = {0};
+    int            numScores            = 0;
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
         tempo += dt;
 
         // ── Input ──────────────────────────────────────────────────────────────
+        if (tela == TELA_RANKING && IsKeyPressed(KEY_ESCAPE))
+            tela = TELA_MENU;
+
         if (tela == TELA_MENU) {
             if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
                 selecao = (selecao + 1) % TOTAL_OPCOES;
@@ -186,18 +269,42 @@ int main(void) {
         if (tela == TELA_JOGO) {
             if (!jogoVivo) {
                 iniciarJogo(&jogo);
-                jogoVivo = 1;
+                jogoVivo     = 1;
+                jogoEmPausa  = 0;
+                selecaoPausa = 0;
             }
-            atualizarJogo(&jogo, dt);
 
-            for (int i = 0; i < NUM_COLUNAS; i++)
-                if (IsKeyPressed(KEYS_JOGO[i]))
-                    verificarAcerto(&jogo, i);
-
-            if (IsKeyPressed(KEY_ESCAPE)) {
-                encerrarJogo(&jogo);
-                jogoVivo = 0;
-                tela     = TELA_MENU;
+            if (jogoEmPausa) {
+                if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
+                    selecaoPausa = (selecaoPausa + 1) % 2;
+                if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+                    selecaoPausa = (selecaoPausa + 1) % 2;
+                if (IsKeyPressed(KEY_ESCAPE)) {
+                    jogoEmPausa  = 0;
+                    selecaoPausa = 0;
+                }
+                if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
+                    if (selecaoPausa == 0) {
+                        jogoEmPausa  = 0;
+                        selecaoPausa = 0;
+                    } else {
+                        adicionarScore(ranking, &numScores, jogo.pontuacao);
+                        encerrarJogo(&jogo);
+                        jogoVivo     = 0;
+                        jogoEmPausa  = 0;
+                        selecaoPausa = 0;
+                        tela         = TELA_MENU;
+                    }
+                }
+            } else {
+                atualizarJogo(&jogo, dt);
+                for (int i = 0; i < NUM_COLUNAS; i++)
+                    if (IsKeyPressed(KEYS_JOGO[i]))
+                        verificarAcerto(&jogo, i);
+                if (IsKeyPressed(KEY_ESCAPE)) {
+                    jogoEmPausa  = 1;
+                    selecaoPausa = 0;
+                }
             }
         }
 
@@ -242,12 +349,23 @@ int main(void) {
 
         } else if (tela == TELA_JOGO) {
             DesenharJogo(&jogo);
+            if (jogoEmPausa) {
+                int acao = DesenharPausa(selecaoPausa);
+                if (acao == 0) {
+                    jogoEmPausa  = 0;
+                    selecaoPausa = 0;
+                } else if (acao == 1) {
+                    adicionarScore(ranking, &numScores, jogo.pontuacao);
+                    encerrarJogo(&jogo);
+                    jogoVivo     = 0;
+                    jogoEmPausa  = 0;
+                    selecaoPausa = 0;
+                    tela         = TELA_MENU;
+                }
+            }
 
         } else if (tela == TELA_RANKING) {
-            DesenharTextoCentralizado("RANKING", 200, 40, COR_DOURADO);
-            DesenharTextoCentralizado("Nenhuma pontuacao registrada ainda.", 270, 20, COR_BRANCO);
-            DesenharTextoCentralizado("Pressione ESC para voltar", 320, 18, COR_CINZA);
-            if (IsKeyPressed(KEY_ESCAPE)) tela = TELA_MENU;
+            DesenharRanking(ranking, numScores);
         }
 
         EndDrawing();

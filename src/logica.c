@@ -93,3 +93,30 @@ void encerrarJogo(EstadoJogo *estado) {
     for (int i = 0; i < NUM_COLUNAS; i++)
         limparLista(&estado->colunas[i]);
 }
+
+/* Insertion Sort decrescente: maior pontuação primeiro */
+void ordenarRanking(EntradaRanking *ranking, int n) {
+    for (int i = 1; i < n; i++) {
+        EntradaRanking chave = ranking[i];
+        int j = i - 1;
+        while (j >= 0 && ranking[j].pontuacao < chave.pontuacao) {
+            ranking[j + 1] = ranking[j];
+            j--;
+        }
+        ranking[j + 1] = chave;
+    }
+}
+
+void adicionarScore(EntradaRanking *ranking, int *n, int pontuacao) {
+    if (pontuacao <= 0) return;
+
+    if (*n < MAX_RANKING) {
+        ranking[(*n)++].pontuacao = pontuacao;
+    } else if (pontuacao > ranking[*n - 1].pontuacao) {
+        /* Substitui o último (menor) se o novo score for maior */
+        ranking[*n - 1].pontuacao = pontuacao;
+    } else {
+        return;
+    }
+    ordenarRanking(ranking, *n);
+}

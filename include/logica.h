@@ -29,9 +29,17 @@ typedef struct {
     float      tempoFeedback[NUM_COLUNAS];
 } EstadoJogo;
 
+#define MAX_RANKING 10
+
+typedef struct {
+    int pontuacao;
+} EntradaRanking;
+
 void       iniciarJogo(EstadoJogo *estado);
 void       atualizarJogo(EstadoJogo *estado, float dt);
 TipoAcerto verificarAcerto(EstadoJogo *estado, int coluna);
 void       encerrarJogo(EstadoJogo *estado);
+void       ordenarRanking(EntradaRanking *ranking, int n);
+void       adicionarScore(EntradaRanking *ranking, int *n, int pontuacao);
 
 #endif
