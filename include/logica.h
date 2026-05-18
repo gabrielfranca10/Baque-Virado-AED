@@ -1,0 +1,37 @@
+#ifndef LOGICA_H
+#define LOGICA_H
+
+#include "lista.h"
+
+#define NUM_COLUNAS       4
+#define VELOCIDADE_NOTA   200.0f
+#define LINHA_ACERTO      500
+#define NOTE_START_Y      (-30.0f)
+#define JANELA_ACERTO     45
+#define INTERVALO_SPAWN   0.5f
+#define FEEDBACK_DURACAO  0.5f
+
+typedef enum {
+    ACERTO_NENHUM = 0,
+    ACERTO_PERFEITO,
+    ACERTO_BOM,
+    ACERTO_ERROU
+} TipoAcerto;
+
+typedef struct {
+    Lista      colunas[NUM_COLUNAS];
+    int        pontuacao;
+    int        combo;
+    float      tempoJogo;
+    float      tempoProxSpawn;
+    int        idxSequencia;
+    TipoAcerto ultimoAcerto[NUM_COLUNAS];
+    float      tempoFeedback[NUM_COLUNAS];
+} EstadoJogo;
+
+void       iniciarJogo(EstadoJogo *estado);
+void       atualizarJogo(EstadoJogo *estado, float dt);
+TipoAcerto verificarAcerto(EstadoJogo *estado, int coluna);
+void       encerrarJogo(EstadoJogo *estado);
+
+#endif
