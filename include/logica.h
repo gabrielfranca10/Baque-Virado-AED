@@ -4,12 +4,14 @@
 #include "lista.h"
 
 #define NUM_COLUNAS       4
-#define VELOCIDADE_NOTA   200.0f
+#define BPM_FASE1         110.0f
+#define INTERVALO_SPAWN   (60.0f / BPM_FASE1)
+#define VELOCIDADE_NOTA   194.3f
 #define LINHA_ACERTO      500
 #define NOTE_START_Y      (-30.0f)
 #define JANELA_ACERTO     45
-#define INTERVALO_SPAWN   0.5f
 #define FEEDBACK_DURACAO  0.5f
+#define DURACAO_FASE1     120.0f
 
 typedef enum {
     ACERTO_NENHUM = 0,
