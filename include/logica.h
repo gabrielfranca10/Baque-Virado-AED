@@ -2,6 +2,7 @@
 #define LOGICA_H
 
 #include "lista.h"
+#include <stdlib.h>
 
 #define NUM_COLUNAS      4
 #define TOTAL_FASES      2
@@ -37,6 +38,7 @@ typedef struct {
     int        faseAtual;
     TipoAcerto ultimoAcerto[NUM_COLUNAS];
     float      tempoFeedback[NUM_COLUNAS];
+    int        permutacaoColunas[NUM_COLUNAS];
 } EstadoJogo;
 
 #define MAX_RANKING 10

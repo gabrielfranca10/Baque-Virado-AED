@@ -2,6 +2,8 @@
 #include "logica.h"
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 #define COR_FUNDO    (Color){15,  10,  30,  255}
 #define COR_DOURADO  (Color){255, 200, 50,  255}
@@ -272,6 +274,7 @@ int main(void) {
     const int LARGURA = 800;
     const int ALTURA  = 600;
 
+    srand((unsigned int)time(NULL));
     InitWindow(LARGURA, ALTURA, "Baque Virado - Maracatu");
     SetExitKey(KEY_NULL);
     SetTargetFPS(60);

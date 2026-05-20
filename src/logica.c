@@ -103,9 +103,16 @@ static const int TAMANHOS[TOTAL_FASES] = {
 
 void iniciarJogo(EstadoJogo *estado, int fase) {
     for (int i = 0; i < NUM_COLUNAS; i++) {
-        estado->colunas[i]       = criarLista();
-        estado->ultimoAcerto[i]  = ACERTO_NENHUM;
-        estado->tempoFeedback[i] = 0.0f;
+        estado->colunas[i]            = criarLista();
+        estado->ultimoAcerto[i]       = ACERTO_NENHUM;
+        estado->tempoFeedback[i]      = 0.0f;
+        estado->permutacaoColunas[i]  = i;
+    }
+    for (int i = NUM_COLUNAS - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        int tmp = estado->permutacaoColunas[i];
+        estado->permutacaoColunas[i] = estado->permutacaoColunas[j];
+        estado->permutacaoColunas[j] = tmp;
     }
     estado->pontuacao    = 0;
     estado->combo        = 0;
@@ -126,7 +133,7 @@ void atualizarJogo(EstadoJogo *estado, float dt) {
     while (estado->idxSequencia < total) {
         float tempoSpawn = mapa[estado->idxSequencia].tempo - TEMPO_QUEDA;
         if (estado->tempoJogo >= tempoSpawn) {
-            int col = mapa[estado->idxSequencia].coluna;
+            int col = estado->permutacaoColunas[mapa[estado->idxSequencia].coluna];
             inserirNota(&estado->colunas[col], NOTE_START_Y);
             estado->idxSequencia++;
         } else {
