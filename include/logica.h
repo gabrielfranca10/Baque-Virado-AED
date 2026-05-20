@@ -3,15 +3,14 @@
 
 #include "lista.h"
 
-#define NUM_COLUNAS       4
-#define BPM_FASE1         110.0f
-#define INTERVALO_SPAWN   (60.0f / BPM_FASE1)
-#define VELOCIDADE_NOTA   194.3f
-#define LINHA_ACERTO      500
-#define NOTE_START_Y      (-30.0f)
-#define JANELA_ACERTO     45
-#define FEEDBACK_DURACAO  0.5f
-#define DURACAO_FASE1     120.0f
+#define NUM_COLUNAS      4
+#define VELOCIDADE_NOTA  194.3f
+#define LINHA_ACERTO     500
+#define NOTE_START_Y     (-30.0f)
+#define JANELA_ACERTO    45
+#define FEEDBACK_DURACAO 0.5f
+#define DURACAO_FASE1    80.0f
+#define TEMPO_QUEDA      ((LINHA_ACERTO - NOTE_START_Y) / VELOCIDADE_NOTA)
 
 typedef enum {
     ACERTO_NENHUM = 0,
@@ -25,23 +24,21 @@ typedef struct {
     int        pontuacao;
     int        combo;
     float      tempoJogo;
-    float      tempoProxSpawn;
     int        idxSequencia;
     TipoAcerto ultimoAcerto[NUM_COLUNAS];
     float      tempoFeedback[NUM_COLUNAS];
 } EstadoJogo;
 
 #define MAX_RANKING 10
-
 typedef struct {
     int pontuacao;
 } EntradaRanking;
 
-void       iniciarJogo(EstadoJogo *estado);
-void       atualizarJogo(EstadoJogo *estado, float dt);
+void       iniciarJogo    (EstadoJogo *estado);
+void       atualizarJogo  (EstadoJogo *estado, float dt);
 TipoAcerto verificarAcerto(EstadoJogo *estado, int coluna);
-void       encerrarJogo(EstadoJogo *estado);
-void       ordenarRanking(EntradaRanking *ranking, int n);
-void       adicionarScore(EntradaRanking *ranking, int *n, int pontuacao);
+void       encerrarJogo   (EstadoJogo *estado);
+void       ordenarRanking (EntradaRanking *ranking, int n);
+void       adicionarScore (EntradaRanking *ranking, int *n, int pontuacao);
 
 #endif
