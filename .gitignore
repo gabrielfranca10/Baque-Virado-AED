@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
 
+# Compiled binary
+baque-virado
+
 # Object files
 *.o
 *.ko
