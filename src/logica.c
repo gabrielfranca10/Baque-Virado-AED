@@ -1,8 +1,10 @@
 #include "logica.h"
+#include <stdlib.h>
 
 const InfoFase FASES[TOTAL_FASES] = {
     {"FASE 1 — Maracatu Atomico", "assets/maracatu_atomico.mp3", "Chico Science & Nacao Zumbi"},
     {"FASE 2 — Sangue de Bairro", "assets/fase2.mp3",            "Nacao Zumbi"},
+    {"FASE 3 — O Berimbau",       "assets/fase3.mp3",            "Nacao Zumbi"},
 };
 
 typedef struct { int coluna; float tempo; } EventoNota;
@@ -95,10 +97,208 @@ static const EventoNota MAPA_FASE2[] = {
     {0, 79.487f}, {3, 79.868f},
 };
 
-static const EventoNota *MAPAS[TOTAL_FASES] = { MAPA_FASE1, MAPA_FASE2 };
+static const EventoNota MAPA_FASE3[] = {
+    {2, 1.854f},
+    {0, 2.256f},
+    {3, 2.659f},
+    {1, 3.061f},
+    {0, 3.463f}, {3, 3.463f},
+    {1, 3.866f},
+    {2, 4.268f},
+    {3, 4.670f},
+    {1, 5.073f}, {2, 5.073f},
+    {0, 5.475f},
+    {3, 5.877f},
+    {2, 6.280f},
+    {0, 6.682f}, {2, 6.682f},
+    {1, 7.084f},
+    {3, 7.487f},
+    {2, 7.889f},
+    {1, 8.291f}, {3, 8.291f},
+    {0, 8.694f},
+    {2, 9.096f},
+    {3, 9.498f},
+    {0, 9.901f},
+    {1, 10.303f}, {3, 10.303f},
+    {2, 10.705f},
+    {0, 11.108f},
+    {1, 11.510f}, {3, 11.510f},
+    {2, 11.912f},
+    {0, 12.315f},
+    {1, 12.717f},
+    {0, 13.119f}, {2, 13.119f},
+    {3, 13.522f},
+    {1, 13.924f},
+    {2, 14.326f},
+    {0, 14.729f}, {2, 14.729f},
+    {1, 15.131f},
+    {3, 15.533f},
+    {1, 15.936f}, {3, 15.936f},
+    {2, 16.338f},
+    {0, 16.740f},
+    {0, 17.143f}, {2, 17.143f},
+    {3, 17.545f},
+    {1, 17.947f},
+    {1, 18.350f}, {3, 18.350f},
+    {0, 18.752f},
+    {2, 19.154f},
+    {1, 19.557f}, {2, 19.557f},
+    {3, 19.959f},
+    {0, 20.361f},
+    {0, 20.764f}, {3, 20.764f},
+    {2, 21.166f},
+    {1, 21.568f},
+    {0, 21.971f}, {3, 21.971f},
+    {2, 22.373f},
+    {1, 22.775f}, {3, 22.775f},
+    {0, 23.178f},
+    {2, 23.580f},
+    {0, 23.982f}, {2, 23.982f},
+    {1, 24.385f},
+    {3, 24.787f},
+    {1, 25.189f}, {2, 25.189f},
+    {0, 25.592f},
+    {3, 25.994f},
+    {0, 26.396f}, {3, 26.396f},
+    {1, 26.799f},
+    {2, 27.201f},
+    {0, 27.603f}, {3, 27.603f},
+    {1, 28.006f}, {2, 28.006f},
+    {0, 28.408f},
+    {3, 28.810f},
+    {1, 29.213f}, {3, 29.213f},
+    {0, 29.615f},
+    {2, 30.017f},
+    {0, 30.420f}, {2, 30.420f},
+    {1, 30.822f},
+    {3, 31.224f},
+    {1, 31.627f}, {3, 31.627f},
+    {2, 32.029f},
+    {0, 32.431f},
+    {0, 32.834f}, {2, 32.834f},
+    {3, 33.236f},
+    {1, 33.638f},
+    {0, 34.041f}, {3, 34.041f},
+    {1, 34.443f}, {2, 34.443f},
+    {3, 34.845f},
+    {0, 35.248f},
+    {0, 35.650f}, {2, 35.650f},
+    {1, 36.052f},
+    {3, 36.455f},
+    {1, 36.857f}, {3, 36.857f},
+    {2, 37.259f},
+    {0, 37.662f},
+    {1, 38.064f}, {3, 38.064f},
+    {2, 38.466f},
+    {0, 38.869f}, {3, 38.869f},
+    {1, 39.271f},
+    {2, 39.673f},
+    {1, 40.076f}, {2, 40.076f},
+    {3, 40.478f},
+    {0, 40.880f},
+    {2, 41.283f},
+    {1, 41.685f},
+    {3, 42.087f},
+    {2, 42.490f},
+    {0, 42.892f},
+    {1, 43.294f},
+    {0, 43.697f}, {2, 43.697f},
+    {3, 44.099f},
+    {1, 44.501f},
+    {0, 44.904f}, {3, 44.904f},
+    {2, 45.306f},
+    {1, 45.708f},
+    {3, 46.111f},
+    {0, 46.513f},
+    {1, 46.915f}, {3, 46.915f},
+    {2, 47.318f},
+    {0, 47.720f},
+    {3, 48.122f},
+    {1, 48.525f},
+    {0, 48.927f}, {2, 48.927f},
+    {3, 49.329f},
+    {1, 49.732f},
+    {0, 50.134f},
+    {2, 50.536f},
+    {3, 50.939f},
+    {0, 51.341f}, {2, 51.341f},
+    {1, 51.743f},
+    {3, 52.146f},
+    {2, 52.548f},
+    {0, 52.950f}, {1, 52.950f},
+    {0, 53.353f}, {3, 53.353f},
+    {1, 53.755f}, {2, 53.755f},
+    {0, 54.157f}, {2, 54.157f},
+    {1, 54.560f},
+    {3, 54.962f},
+    {0, 55.364f}, {3, 55.364f},
+    {1, 55.767f}, {2, 55.767f},
+    {2, 56.169f},
+    {0, 56.571f},
+    {1, 56.974f}, {3, 56.974f},
+    {2, 57.376f},
+    {0, 57.778f}, {2, 57.778f},
+    {3, 58.181f},
+    {1, 58.583f},
+    {0, 58.985f}, {3, 58.985f},
+    {1, 59.388f}, {2, 59.388f},
+    {3, 59.790f},
+    {0, 60.192f},
+    {0, 60.595f}, {2, 60.595f},
+    {1, 60.997f},
+    {3, 61.399f},
+    {1, 61.802f}, {3, 61.802f},
+    {0, 62.204f}, {2, 62.204f},
+    {3, 62.606f},
+    {1, 63.009f},
+    {0, 63.411f}, {3, 63.411f},
+    {1, 63.813f}, {2, 63.813f},
+    {0, 64.216f},
+    {3, 64.618f},
+    {0, 65.020f}, {2, 65.020f},
+    {1, 65.423f}, {3, 65.423f},
+    {2, 65.825f},
+    {0, 66.227f}, {3, 66.227f},
+    {2, 66.630f},
+    {1, 67.032f},
+    {1, 67.434f}, {3, 67.434f},
+    {0, 67.837f},
+    {2, 68.239f},
+    {0, 68.641f}, {2, 68.641f},
+    {3, 69.044f},
+    {1, 69.446f},
+    {1, 69.848f}, {3, 69.848f},
+    {0, 70.251f},
+    {2, 70.653f},
+    {0, 71.055f}, {3, 71.055f},
+    {1, 71.458f}, {2, 71.458f},
+    {3, 71.860f},
+    {0, 72.262f},
+    {0, 72.665f}, {2, 72.665f},
+    {1, 73.067f},
+    {3, 73.469f},
+    {1, 73.872f}, {3, 73.872f},
+    {2, 74.274f},
+    {0, 74.676f},
+    {0, 75.079f}, {2, 75.079f},
+    {3, 75.481f},
+    {1, 75.883f},
+    {0, 76.286f}, {3, 76.286f},
+    {1, 76.688f}, {2, 76.688f},
+    {3, 77.090f},
+    {0, 77.493f},
+    {1, 77.895f}, {2, 77.895f},
+    {3, 78.297f},
+    {0, 78.700f}, {3, 78.700f},
+    {1, 79.102f},
+    {2, 79.504f},
+};
+
+static const EventoNota *MAPAS[TOTAL_FASES] = { MAPA_FASE1, MAPA_FASE2, MAPA_FASE3 };
 static const int TAMANHOS[TOTAL_FASES] = {
     sizeof(MAPA_FASE1) / sizeof(MAPA_FASE1[0]),
     sizeof(MAPA_FASE2) / sizeof(MAPA_FASE2[0]),
+    sizeof(MAPA_FASE3) / sizeof(MAPA_FASE3[0]),
 };
 
 void iniciarJogo(EstadoJogo *estado, int fase) {
@@ -129,6 +329,7 @@ void atualizarJogo(EstadoJogo *estado, float dt) {
 
     const EventoNota *mapa  = MAPAS[estado->faseAtual];
     int               total = TAMANHOS[estado->faseAtual];
+    float janela = (estado->faseAtual == 2) ? (float)JANELA_ACERTO_F3 : (float)JANELA_ACERTO;
 
     while (estado->idxSequencia < total) {
         float tempoSpawn = mapa[estado->idxSequencia].tempo - TEMPO_QUEDA;
@@ -145,7 +346,7 @@ void atualizarJogo(EstadoJogo *estado, float dt) {
         atualizarNotas(&estado->colunas[i], dt, VELOCIDADE_NOTA);
 
         while (!listaVazia(&estado->colunas[i]) &&
-               estado->colunas[i].cabeca->y > LINHA_ACERTO + JANELA_ACERTO) {
+               estado->colunas[i].cabeca->y > LINHA_ACERTO + janela) {
             removerNota(&estado->colunas[i]);
             estado->combo = 0;
         }
@@ -166,25 +367,18 @@ TipoAcerto verificarAcerto(EstadoJogo *estado, int coluna) {
     float dist = estado->colunas[coluna].cabeca->y - (float)LINHA_ACERTO;
     if (dist < 0.0f) dist = -dist;
 
+    float janela = (estado->faseAtual == 2) ? (float)JANELA_ACERTO_F3 : (float)JANELA_ACERTO;
     TipoAcerto resultado;
 
-    if (dist <= JANELA_ACERTO * 0.4f) {
+    if (dist <= janela * 0.4f) {
         resultado = ACERTO_PERFEITO;
         estado->combo++;
-        int mult;
-        if (estado->combo > 8)
-            mult = 8;
-        else
-            mult = estado->combo;
+        int mult = estado->combo > 8 ? 8 : estado->combo;
         estado->pontuacao += 100 * mult;
-    } else if (dist <= (float)JANELA_ACERTO) {
+    } else if (dist <= janela) {
         resultado = ACERTO_BOM;
         estado->combo++;
-        int mult;
-        if (estado->combo > 8)
-            mult = 8;
-        else
-            mult = estado->combo;
+        int mult = estado->combo > 8 ? 8 : estado->combo;
         estado->pontuacao += 50 * mult;
     } else {
         estado->combo = 0;

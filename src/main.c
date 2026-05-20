@@ -18,7 +18,7 @@
 #define NOTA_MARGEM   12
 
 typedef enum { OPCAO_JOGAR=0, OPCAO_RANKING, OPCAO_SAIR, TOTAL_OPCOES } OpcaoMenu;
-typedef enum { TELA_MENU, TELA_JOGO, TELA_PONTUACAO, TELA_RANKING, TELA_SAIR } TelaAtual;
+typedef enum { TELA_MENU, TELA_JOGO, TELA_PONTUACAO, TELA_ENCERRADO, TELA_RANKING, TELA_SAIR } TelaAtual;
 
 static Color       COR_FAIXAS[NUM_COLUNAS]  = {
     {220, 60,  60,  255},
@@ -218,6 +218,39 @@ static void DesenharPontuacao(int pontuacao, int fase) {
     }
 }
 
+static void DesenharJogoEncerrado(int pontuacao) {
+    int sw = GetScreenWidth();
+    int sh = GetScreenHeight();
+
+    for (int i = 0; i < 7; i++)
+        DrawCircleLines(sw/2, sh/2, 50 + i*65, (Color){200, 30, 50, 6 + i*3});
+
+    DesenharLinhaDourada(55, 40);
+    DesenharTextoCentralizado("JOGO", 68, 52, COR_VERMELHO);
+    DesenharTextoCentralizado("ENCERRADO", 126, 52, COR_DOURADO);
+    DesenharLinhaDourada(188, 40);
+
+    DesenharTextoCentralizado("Todas as 3 fases concluidas!", 206, 15, COR_CINZA);
+
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%d", pontuacao);
+    DesenharTextoCentralizado(buf,              250, 68, COR_DOURADO);
+    DesenharTextoCentralizado("PONTUACAO FINAL", 328, 16, COR_BRANCO);
+
+    const char *rating;
+    Color       rcor;
+    if      (pontuacao >= 12000) { rating = "MESTRE DO MARACATU!"; rcor = COR_DOURADO; }
+    else if (pontuacao >= 6000)  { rating = "IMPRESSIONANTE!";     rcor = (Color){60, 200, 110, 255}; }
+    else if (pontuacao >= 2000)  { rating = "BEM JOGADO!";         rcor = COR_BRANCO; }
+    else                         { rating = "CONTINUE TREINANDO!"; rcor = COR_CINZA; }
+
+    DesenharTextoCentralizado(rating, 370, 24, rcor);
+    DesenharLinhaDourada(415, 40);
+
+    DesenharTextoCentralizado("ENTER ou ESC — voltar ao menu",  434, 15, COR_BRANCO);
+    DesenharTextoCentralizado("R — jogar a fase 3 novamente",   458, 15, COR_CINZA);
+}
+
 static void DesenharRanking(EntradaRanking *ranking, int n) {
     DesenharLinhaDourada(60, 60);
     DesenharTextoCentralizado("RANKING", 72, 40, COR_DOURADO);
@@ -345,6 +378,21 @@ int main(void) {
             }
         }
 
+        if (tela == TELA_ENCERRADO) {
+            if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE)) {
+                faseAtual = 0;
+                tela = TELA_MENU;
+            }
+            if (IsKeyPressed(KEY_R)) {
+                UnloadMusicStream(musica);
+                musica = CarregarMusicaFase(faseAtual);
+                iniciarJogo(&jogo, faseAtual);
+                jogoVivo = 1; jogoEmPausa = 0;
+                PlayMusicStream(musica);
+                tela = TELA_JOGO;
+            }
+        }
+
         if (tela == TELA_JOGO) {
             if (!jogoVivo) {
                 faseAtual = 0;
@@ -391,7 +439,7 @@ int main(void) {
                     adicionarScore(ranking, &numScores, pontuacaoFinal);
                     encerrarJogo(&jogo);
                     jogoVivo = 0;
-                    tela     = TELA_PONTUACAO;
+                    tela = (faseAtual == TOTAL_FASES - 1) ? TELA_ENCERRADO : TELA_PONTUACAO;
                 }
 
                 if (IsKeyPressed(KEY_ESCAPE)) {
@@ -459,6 +507,9 @@ int main(void) {
 
         } else if (tela == TELA_PONTUACAO) {
             DesenharPontuacao(pontuacaoFinal, faseAtual);
+
+        } else if (tela == TELA_ENCERRADO) {
+            DesenharJogoEncerrado(pontuacaoFinal);
 
         } else if (tela == TELA_RANKING) {
             DesenharRanking(ranking, numScores);

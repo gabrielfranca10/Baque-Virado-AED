@@ -5,11 +5,12 @@
 #include <stdlib.h>
 
 #define NUM_COLUNAS      4
-#define TOTAL_FASES      2
+#define TOTAL_FASES      3
 #define VELOCIDADE_NOTA  194.3f
 #define LINHA_ACERTO     500
 #define NOTE_START_Y     (-30.0f)
 #define JANELA_ACERTO    45
+#define JANELA_ACERTO_F3 28
 #define FEEDBACK_DURACAO 0.5f
 #define DURACAO_FASE     80.0f
 #define TEMPO_QUEDA      ((LINHA_ACERTO - NOTE_START_Y) / VELOCIDADE_NOTA)
