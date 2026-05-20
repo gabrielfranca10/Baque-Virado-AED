@@ -111,7 +111,10 @@ void iniciarJogo(EstadoJogo *estado, int fase) {
     estado->combo        = 0;
     estado->tempoJogo    = 0.0f;
     estado->idxSequencia = 0;
-    estado->faseAtual    = (fase >= 0 && fase < TOTAL_FASES) ? fase : 0;
+    if (fase >= 0 && fase < TOTAL_FASES)
+        estado->faseAtual = fase;
+    else
+        estado->faseAtual = 0;
 }
 
 void atualizarJogo(EstadoJogo *estado, float dt) {
@@ -161,12 +164,20 @@ TipoAcerto verificarAcerto(EstadoJogo *estado, int coluna) {
     if (dist <= JANELA_ACERTO * 0.4f) {
         resultado = ACERTO_PERFEITO;
         estado->combo++;
-        int mult = estado->combo > 8 ? 8 : estado->combo;
+        int mult;
+        if (estado->combo > 8)
+            mult = 8;
+        else
+            mult = estado->combo;
         estado->pontuacao += 100 * mult;
     } else if (dist <= (float)JANELA_ACERTO) {
         resultado = ACERTO_BOM;
         estado->combo++;
-        int mult = estado->combo > 8 ? 8 : estado->combo;
+        int mult;
+        if (estado->combo > 8)
+            mult = 8;
+        else
+            mult = estado->combo;
         estado->pontuacao += 50 * mult;
     } else {
         estado->combo = 0;
@@ -179,6 +190,15 @@ TipoAcerto verificarAcerto(EstadoJogo *estado, int coluna) {
     estado->ultimoAcerto[coluna]  = resultado;
     estado->tempoFeedback[coluna] = FEEDBACK_DURACAO;
     return resultado;
+}
+
+int faseConcluida(const EstadoJogo *estado) {
+    if (estado->idxSequencia < TAMANHOS[estado->faseAtual])
+        return 0;
+    for (int i = 0; i < NUM_COLUNAS; i++)
+        if (!listaVazia((Lista *)&estado->colunas[i]))
+            return 0;
+    return 1;
 }
 
 void encerrarJogo(EstadoJogo *estado) {

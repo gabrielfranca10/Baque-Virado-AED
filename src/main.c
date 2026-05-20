@@ -110,7 +110,11 @@ static void DesenharJogo(EstadoJogo *estado) {
         if (IsKeyDown(KEYS_JOGO[i]))
             DrawCircle(cx, LINHA_ACERTO, 40, (Color){cor.r, cor.g, cor.b, 120});
 
-        float btnR = IsKeyDown(KEYS_JOGO[i]) ? 25.0f : 30.0f;
+        float btnR;
+        if (IsKeyDown(KEYS_JOGO[i]))
+            btnR = 25.0f;
+        else
+            btnR = 30.0f;
         DrawCircle(cx, LINHA_ACERTO, (int)btnR, (Color){cor.r/5, cor.g/5, cor.b/5, 220});
         DrawCircleLines(cx, LINHA_ACERTO, (int)btnR, cor);
 
@@ -228,7 +232,11 @@ static void DesenharRanking(EntradaRanking *ranking, int n) {
         int yInicio = 150, passo = 40;
 
         for (int i = 0; i < n; i++) {
-            Color cor = (i < 3) ? medalha[i] : COR_BRANCO;
+            Color cor;
+            if (i < 3)
+                cor = medalha[i];
+            else
+                cor = COR_BRANCO;
 
             if (i < 3) {
                 Rectangle fundo = {100, yInicio + i*passo - 6, 600, 34};
@@ -374,9 +382,8 @@ int main(void) {
                     if (IsKeyPressed(KEYS_JOGO[i]))
                         verificarAcerto(&jogo, i);
 
-                int musicaAcabou = (musica.frameCount > 0 && !IsMusicStreamPlaying(musica));
-                int timerAcabou  = (musica.frameCount == 0 && jogo.tempoJogo >= DURACAO_FASE);
-                if (musicaAcabou || timerAcabou) {
+                if (faseConcluida(&jogo)) {
+                    StopMusicStream(musica);
                     pontuacaoFinal = jogo.pontuacao;
                     adicionarScore(ranking, &numScores, pontuacaoFinal);
                     encerrarJogo(&jogo);
