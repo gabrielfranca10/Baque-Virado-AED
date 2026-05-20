@@ -4,13 +4,22 @@
 #include "lista.h"
 
 #define NUM_COLUNAS      4
+#define TOTAL_FASES      2
 #define VELOCIDADE_NOTA  194.3f
 #define LINHA_ACERTO     500
 #define NOTE_START_Y     (-30.0f)
 #define JANELA_ACERTO    45
 #define FEEDBACK_DURACAO 0.5f
-#define DURACAO_FASE1    80.0f
+#define DURACAO_FASE     80.0f
 #define TEMPO_QUEDA      ((LINHA_ACERTO - NOTE_START_Y) / VELOCIDADE_NOTA)
+
+typedef struct {
+    const char *titulo;
+    const char *arquivo;
+    const char *artista;
+} InfoFase;
+
+extern const InfoFase FASES[TOTAL_FASES];
 
 typedef enum {
     ACERTO_NENHUM = 0,
@@ -25,6 +34,7 @@ typedef struct {
     int        combo;
     float      tempoJogo;
     int        idxSequencia;
+    int        faseAtual;
     TipoAcerto ultimoAcerto[NUM_COLUNAS];
     float      tempoFeedback[NUM_COLUNAS];
 } EstadoJogo;
@@ -34,7 +44,7 @@ typedef struct {
     int pontuacao;
 } EntradaRanking;
 
-void       iniciarJogo    (EstadoJogo *estado);
+void       iniciarJogo    (EstadoJogo *estado, int fase);
 void       atualizarJogo  (EstadoJogo *estado, float dt);
 TipoAcerto verificarAcerto(EstadoJogo *estado, int coluna);
 void       encerrarJogo   (EstadoJogo *estado);

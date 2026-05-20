@@ -155,7 +155,7 @@ static void DesenharJogo(EstadoJogo *estado) {
     snprintf(buf, sizeof(buf), "COMBO x%d", estado->combo);
     DrawText(buf, 10, 44, 18, COR_BRANCO);
 
-    DesenharTextoCentralizado("FASE 1 — Maracatu Atomico", 14, 13, COR_CINZA);
+    DesenharTextoCentralizado(FASES[estado->faseAtual].titulo, 14, 13, COR_CINZA);
     DesenharTextoCentralizado("ESC — pausar", 575, 13, COR_CINZA);
 }
 
@@ -178,17 +178,19 @@ static int DesenharPausa(int selecao) {
     return acao;
 }
 
-static void DesenharPontuacao(int pontuacao) {
+static void DesenharPontuacao(int pontuacao, int fase) {
+    char titulo[64];
+    snprintf(titulo, sizeof(titulo), "FASE %d CONCLUIDA!", fase + 1);
+
     DesenharLinhaDourada(60, 60);
-    DesenharTextoCentralizado("FASE 1 CONCLUIDA!", 75, 38, COR_DOURADO);
+    DesenharTextoCentralizado(titulo, 75, 38, COR_DOURADO);
     DesenharLinhaDourada(122, 60);
-    DesenharTextoCentralizado("Maracatu Atomico  —  Chico Science & Nacao Zumbi",
-                              140, 14, COR_CINZA);
+    DesenharTextoCentralizado(FASES[fase].artista, 140, 14, COR_CINZA);
 
     char buf[32];
     snprintf(buf, sizeof(buf), "%d", pontuacao);
-    DesenharTextoCentralizado(buf,     220, 64, COR_DOURADO);
-    DesenharTextoCentralizado("PONTOS", 294, 18, COR_BRANCO);
+    DesenharTextoCentralizado(buf,     210, 64, COR_DOURADO);
+    DesenharTextoCentralizado("PONTOS", 284, 18, COR_BRANCO);
 
     const char *rating;
     Color       rcor;
@@ -197,10 +199,17 @@ static void DesenharPontuacao(int pontuacao) {
     else if (pontuacao >= 500)  { rating = "BEM JOGADO!";         rcor = COR_BRANCO; }
     else                        { rating = "BOM COMECO!";         rcor = COR_CINZA; }
 
-    DesenharTextoCentralizado(rating, 345, 24, rcor);
-    DesenharLinhaDourada(420, 60);
-    DesenharTextoCentralizado("ENTER — voltar ao menu", 440, 16, COR_BRANCO);
-    DesenharTextoCentralizado("R — jogar novamente",    468, 16, COR_CINZA);
+    DesenharTextoCentralizado(rating, 330, 24, rcor);
+    DesenharLinhaDourada(390, 60);
+
+    if (fase < TOTAL_FASES - 1) {
+        DesenharTextoCentralizado("ENTER — proxima fase",   412, 16, COR_DOURADO);
+        DesenharTextoCentralizado("R — jogar novamente",    438, 16, COR_CINZA);
+        DesenharTextoCentralizado("ESC — voltar ao menu",   464, 16, COR_CINZA);
+    } else {
+        DesenharTextoCentralizado("ENTER — voltar ao menu", 412, 16, COR_BRANCO);
+        DesenharTextoCentralizado("R — jogar novamente",    438, 16, COR_CINZA);
+    }
 }
 
 static void DesenharRanking(EntradaRanking *ranking, int n) {
@@ -245,6 +254,12 @@ static void DesenharRanking(EntradaRanking *ranking, int n) {
     DesenharTextoCentralizado("ESC — voltar ao menu", 560, 14, COR_CINZA);
 }
 
+static Music CarregarMusicaFase(int fase) {
+    Music m = LoadMusicStream(FASES[fase].arquivo);
+    m.looping = false;
+    return m;
+}
+
 int main(void) {
     const int LARGURA = 800;
     const int ALTURA  = 600;
@@ -255,10 +270,7 @@ int main(void) {
     InitAudioDevice();
 
     Texture2D fundo  = LoadTexture("assets/fundo.png");
-    Music musica = LoadMusicStream("assets/maracatu_atomico.ogg");
-    if (musica.frameCount == 0)
-        musica = LoadMusicStream("assets/maracatu_atomico.mp3");
-    musica.looping = false;
+    Music     musica = CarregarMusicaFase(0);
 
     TelaAtual tela    = TELA_MENU;
     OpcaoMenu selecao = OPCAO_JOGAR;
@@ -270,6 +282,7 @@ int main(void) {
     int            jogoEmPausa    = 0;
     int            selecaoPausa   = 0;
     int            pontuacaoFinal = 0;
+    int            faseAtual      = 0;
     EntradaRanking ranking[MAX_RANKING] = {0};
     int            numScores            = 0;
 
@@ -294,25 +307,40 @@ int main(void) {
 
         if (tela == TELA_PONTUACAO) {
             if (IsKeyPressed(KEY_ENTER)) {
-                tela = TELA_MENU;
+                if (faseAtual < TOTAL_FASES - 1) {
+                    faseAtual++;
+                    UnloadMusicStream(musica);
+                    musica = CarregarMusicaFase(faseAtual);
+                    iniciarJogo(&jogo, faseAtual);
+                    jogoVivo = 1; jogoEmPausa = 0;
+                    PlayMusicStream(musica);
+                    tela = TELA_JOGO;
+                } else {
+                    faseAtual = 0;
+                    tela = TELA_MENU;
+                }
             }
             if (IsKeyPressed(KEY_R)) {
-                iniciarJogo(&jogo);
-                jogoVivo    = 1;
-                jogoEmPausa = 0;
-                StopMusicStream(musica);
+                UnloadMusicStream(musica);
+                musica = CarregarMusicaFase(faseAtual);
+                iniciarJogo(&jogo, faseAtual);
+                jogoVivo = 1; jogoEmPausa = 0;
                 PlayMusicStream(musica);
                 tela = TELA_JOGO;
+            }
+            if (IsKeyPressed(KEY_ESCAPE)) {
+                faseAtual = 0;
+                tela = TELA_MENU;
             }
         }
 
         if (tela == TELA_JOGO) {
             if (!jogoVivo) {
-                iniciarJogo(&jogo);
-                jogoVivo     = 1;
-                jogoEmPausa  = 0;
-                selecaoPausa = 0;
-                StopMusicStream(musica);
+                faseAtual = 0;
+                UnloadMusicStream(musica);
+                musica = CarregarMusicaFase(faseAtual);
+                iniciarJogo(&jogo, faseAtual);
+                jogoVivo = 1; jogoEmPausa = 0; selecaoPausa = 0;
                 PlayMusicStream(musica);
             }
 
@@ -334,6 +362,7 @@ int main(void) {
                         encerrarJogo(&jogo);
                         StopMusicStream(musica);
                         jogoVivo = jogoEmPausa = selecaoPausa = 0;
+                        faseAtual = 0;
                         tela = TELA_MENU;
                     }
                 }
@@ -346,7 +375,7 @@ int main(void) {
                         verificarAcerto(&jogo, i);
 
                 int musicaAcabou = (musica.frameCount > 0 && !IsMusicStreamPlaying(musica));
-                int timerAcabou  = (musica.frameCount == 0 && jogo.tempoJogo >= DURACAO_FASE1);
+                int timerAcabou  = (musica.frameCount == 0 && jogo.tempoJogo >= DURACAO_FASE);
                 if (musicaAcabou || timerAcabou) {
                     pontuacaoFinal = jogo.pontuacao;
                     adicionarScore(ranking, &numScores, pontuacaoFinal);
@@ -413,12 +442,13 @@ int main(void) {
                     encerrarJogo(&jogo);
                     StopMusicStream(musica);
                     jogoVivo = jogoEmPausa = selecaoPausa = 0;
+                    faseAtual = 0;
                     tela = TELA_MENU;
                 }
             }
 
         } else if (tela == TELA_PONTUACAO) {
-            DesenharPontuacao(pontuacaoFinal);
+            DesenharPontuacao(pontuacaoFinal, faseAtual);
 
         } else if (tela == TELA_RANKING) {
             DesenharRanking(ranking, numScores);
