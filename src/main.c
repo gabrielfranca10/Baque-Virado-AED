@@ -439,7 +439,10 @@ int main(void) {
                     adicionarScore(ranking, &numScores, pontuacaoFinal);
                     encerrarJogo(&jogo);
                     jogoVivo = 0;
-                    tela = (faseAtual == TOTAL_FASES - 1) ? TELA_ENCERRADO : TELA_PONTUACAO;
+                    if (faseAtual == TOTAL_FASES - 1)
+                        tela = TELA_ENCERRADO;
+                    else
+                        tela = TELA_PONTUACAO;
                 }
 
                 if (IsKeyPressed(KEY_ESCAPE)) {

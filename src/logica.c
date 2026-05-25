@@ -329,7 +329,11 @@ void atualizarJogo(EstadoJogo *estado, float dt) {
 
     const EventoNota *mapa  = MAPAS[estado->faseAtual];
     int               total = TAMANHOS[estado->faseAtual];
-    float janela = (estado->faseAtual == 2) ? (float)JANELA_ACERTO_F3 : (float)JANELA_ACERTO;
+    float janela;
+    if (estado->faseAtual == 2)
+        janela = (float)JANELA_ACERTO_F3;
+    else
+        janela = (float)JANELA_ACERTO;
 
     while (estado->idxSequencia < total) {
         float tempoSpawn = mapa[estado->idxSequencia].tempo - TEMPO_QUEDA;
@@ -367,18 +371,30 @@ TipoAcerto verificarAcerto(EstadoJogo *estado, int coluna) {
     float dist = estado->colunas[coluna].cabeca->y - (float)LINHA_ACERTO;
     if (dist < 0.0f) dist = -dist;
 
-    float janela = (estado->faseAtual == 2) ? (float)JANELA_ACERTO_F3 : (float)JANELA_ACERTO;
+    float janela;
+    if (estado->faseAtual == 2)
+        janela = (float)JANELA_ACERTO_F3;
+    else
+        janela = (float)JANELA_ACERTO;
     TipoAcerto resultado;
 
     if (dist <= janela * 0.4f) {
         resultado = ACERTO_PERFEITO;
         estado->combo++;
-        int mult = estado->combo > 8 ? 8 : estado->combo;
+        int mult;
+        if (estado->combo > 8)
+            mult = 8;
+        else
+            mult = estado->combo;
         estado->pontuacao += 100 * mult;
     } else if (dist <= janela) {
         resultado = ACERTO_BOM;
         estado->combo++;
-        int mult = estado->combo > 8 ? 8 : estado->combo;
+        int mult;
+        if (estado->combo > 8)
+            mult = 8;
+        else
+            mult = estado->combo;
         estado->pontuacao += 50 * mult;
     } else {
         estado->combo = 0;
