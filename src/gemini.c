@@ -20,7 +20,12 @@ static size_t escreverResposta(void *ptr, size_t size, size_t nmemb, void *userd
 }
 
 static void extrairTexto(const char *json, const char *fallback, char *out, int tamanho) {
-    const char *erro = fallback ? fallback : "Nao foi possivel carregar a historia da musica.";
+    const char *erro;
+    if (fallback) {
+        erro = fallback;
+    } else {
+        erro = "Nao foi possivel carregar a historia da musica.";
+    }
     if (strstr(json, "\"error\"")) {
         strncpy(out, erro, tamanho - 1);
         out[tamanho - 1] = '\0';
@@ -62,7 +67,11 @@ static void extrairTexto(const char *json, const char *fallback, char *out, int 
 void buscarLoreGemini(const char *titulo, const char *artista, const char *fallback, char *out, int tamanho) {
     const char *key = getenv("GEMINI_API_KEY");
     if (!key) {
-        strncpy(out, fallback ? fallback : "Defina GEMINI_API_KEY para ver o lore.", tamanho - 1);
+        if (fallback) {
+            strncpy(out, fallback, tamanho - 1);
+        } else {
+            strncpy(out, "Defina GEMINI_API_KEY para ver o lore.", tamanho - 1);
+        }
         out[tamanho - 1] = '\0';
         return;
     }
@@ -106,7 +115,11 @@ void buscarLoreGemini(const char *titulo, const char *artista, const char *fallb
     curl_easy_cleanup(curl);
 
     if (res != CURLE_OK) {
-        strncpy(out, fallback ? fallback : "Erro de conexao com o Gemini.", tamanho - 1);
+        if (fallback) {
+            strncpy(out, fallback, tamanho - 1);
+        } else {
+            strncpy(out, "Erro de conexao com o Gemini.", tamanho - 1);
+        }
         out[tamanho - 1] = '\0';
         return;
     }

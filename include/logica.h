@@ -19,7 +19,6 @@ typedef struct {
     const char *titulo;
     const char *arquivo;
     const char *artista;
-    const char *lore;
 } InfoFase;
 
 extern const InfoFase FASES[TOTAL_FASES];
