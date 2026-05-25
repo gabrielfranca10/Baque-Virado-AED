@@ -1,8 +1,10 @@
 #include "raylib.h"
 #include "logica.h"
+#include "gemini.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #define COR_FUNDO    (Color){15,  10,  30,  255}
@@ -184,19 +186,51 @@ static int DesenharPausa(int selecao) {
     return acao;
 }
 
-static void DesenharPontuacao(int pontuacao, int fase) {
+static void DesenharTextoQuebrado(const char *texto, int y, int tam, Color cor, int largMax) {
+    int sw      = GetScreenWidth();
+    char linha[256];
+    int  iLinha = 0;
+    int  yAtual = y;
+
+    for (int i = 0; texto[i] != '\0'; i++) {
+        linha[iLinha++] = texto[i];
+        linha[iLinha]   = '\0';
+
+        int prox = i + 1;
+        while (texto[prox] != '\0' && texto[prox] != ' ') prox++;
+        char teste[256];
+        strncpy(teste, linha, sizeof(teste) - 1);
+        teste[sizeof(teste) - 1] = '\0';
+        strncat(teste, texto + i + 1, prox - i - 1);
+
+        if (MeasureText(teste, tam) > largMax || texto[i] == '\n') {
+            int lw = MeasureText(linha, tam);
+            DrawText(linha, (sw - lw) / 2, yAtual, tam, cor);
+            yAtual += tam + 4;
+            iLinha  = 0;
+            linha[0] = '\0';
+            if (texto[i] == '\n') continue;
+        }
+    }
+    if (iLinha > 0) {
+        int lw = MeasureText(linha, tam);
+        DrawText(linha, (sw - lw) / 2, yAtual, tam, cor);
+    }
+}
+
+static void DesenharPontuacao(int pontuacao, int fase, const char *lore) {
     char titulo[64];
     snprintf(titulo, sizeof(titulo), "FASE %d CONCLUIDA!", fase + 1);
 
-    DesenharLinhaDourada(60, 60);
-    DesenharTextoCentralizado(titulo, 75, 38, COR_DOURADO);
-    DesenharLinhaDourada(122, 60);
-    DesenharTextoCentralizado(FASES[fase].artista, 140, 14, COR_CINZA);
+    DesenharLinhaDourada(42, 60);
+    DesenharTextoCentralizado(titulo, 54, 32, COR_DOURADO);
+    DesenharLinhaDourada(95, 60);
+    DesenharTextoCentralizado(FASES[fase].artista, 104, 13, COR_CINZA);
 
     char buf[32];
     snprintf(buf, sizeof(buf), "%d", pontuacao);
-    DesenharTextoCentralizado(buf,     210, 64, COR_DOURADO);
-    DesenharTextoCentralizado("PONTOS", 284, 18, COR_BRANCO);
+    DesenharTextoCentralizado(buf,      150, 52, COR_DOURADO);
+    DesenharTextoCentralizado("PONTOS", 208, 16, COR_BRANCO);
 
     const char *rating;
     Color       rcor;
@@ -205,16 +239,21 @@ static void DesenharPontuacao(int pontuacao, int fase) {
     else if (pontuacao >= 500)  { rating = "BEM JOGADO!";         rcor = COR_BRANCO; }
     else                        { rating = "BOM COMECO!";         rcor = COR_CINZA; }
 
-    DesenharTextoCentralizado(rating, 330, 24, rcor);
-    DesenharLinhaDourada(390, 60);
+    DesenharTextoCentralizado(rating, 238, 20, rcor);
+    DesenharLinhaDourada(270, 60);
+
+    if (lore && lore[0] != '\0')
+        DesenharTextoQuebrado(lore, 282, 13, (Color){200, 190, 230, 220}, 640);
+
+    DesenharLinhaDourada(380, 60);
 
     if (fase < TOTAL_FASES - 1) {
-        DesenharTextoCentralizado("ENTER — proxima fase",   412, 16, COR_DOURADO);
-        DesenharTextoCentralizado("R — jogar novamente",    438, 16, COR_CINZA);
-        DesenharTextoCentralizado("ESC — voltar ao menu",   464, 16, COR_CINZA);
+        DesenharTextoCentralizado("ENTER — proxima fase",   396, 15, COR_DOURADO);
+        DesenharTextoCentralizado("R — jogar novamente",    418, 15, COR_CINZA);
+        DesenharTextoCentralizado("ESC — voltar ao menu",   440, 15, COR_CINZA);
     } else {
-        DesenharTextoCentralizado("ENTER — voltar ao menu", 412, 16, COR_BRANCO);
-        DesenharTextoCentralizado("R — jogar novamente",    438, 16, COR_CINZA);
+        DesenharTextoCentralizado("ENTER — voltar ao menu", 396, 15, COR_BRANCO);
+        DesenharTextoCentralizado("R — jogar novamente",    418, 15, COR_CINZA);
     }
 }
 
@@ -329,6 +368,7 @@ int main(void) {
     int            faseAtual      = 0;
     EntradaRanking ranking[MAX_RANKING] = {0};
     int            numScores            = 0;
+    char           loreFase[1024]       = {0};
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -439,10 +479,14 @@ int main(void) {
                     adicionarScore(ranking, &numScores, pontuacaoFinal);
                     encerrarJogo(&jogo);
                     jogoVivo = 0;
-                    if (faseAtual == TOTAL_FASES - 1)
+                    if (faseAtual == TOTAL_FASES - 1) {
                         tela = TELA_ENCERRADO;
-                    else
+                    } else {
+                        loreFase[0] = '\0';
+                        buscarLoreGemini(FASES[faseAtual].titulo, FASES[faseAtual].artista,
+                                         FASES[faseAtual].lore, loreFase, sizeof(loreFase));
                         tela = TELA_PONTUACAO;
+                    }
                 }
 
                 if (IsKeyPressed(KEY_ESCAPE)) {
@@ -509,7 +553,7 @@ int main(void) {
             }
 
         } else if (tela == TELA_PONTUACAO) {
-            DesenharPontuacao(pontuacaoFinal, faseAtual);
+            DesenharPontuacao(pontuacaoFinal, faseAtual, loreFase);
 
         } else if (tela == TELA_ENCERRADO) {
             DesenharJogoEncerrado(pontuacaoFinal);

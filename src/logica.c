@@ -2,9 +2,30 @@
 #include <stdlib.h>
 
 const InfoFase FASES[TOTAL_FASES] = {
-    {"FASE 1 — Maracatu Atomico", "assets/maracatu_atomico.mp3", "Chico Science & Nacao Zumbi"},
-    {"FASE 2 — Sangue de Bairro", "assets/fase2.mp3",            "Nacao Zumbi"},
-    {"FASE 3 — O Berimbau",       "assets/fase3.mp3",            "Nacao Zumbi"},
+    {
+        "FASE 1 — Maracatu Atomico",
+        "assets/maracatu_atomico.mp3",
+        "Chico Science & Nacao Zumbi",
+        "Lancada em 1996 no album 'Afrociberdelia', Maracatu Atomico e um hino do manguebeat "
+        "— movimento que misturou o ritmo ancestral do maracatu pernambucano com rock, hip-hop e elementos eletronicos. "
+        "Chico Science gravou versoes em portugues e ingles, e a musica virou simbolo da cena cultural de Recife nos anos 90."
+    },
+    {
+        "FASE 2 — Sangue de Bairro",
+        "assets/fase2.mp3",
+        "Nacao Zumbi",
+        "Sangue de Bairro e uma das faixas mais cruas e intensas da Nacao Zumbi, banda que continuou o legado do manguebeat "
+        "apos a morte de Chico Science em 1997. A musica traz letras urbanas sobre a realidade das periferias do Recife, "
+        "com a energia pesada do rock fundida ao baque virado do maracatu."
+    },
+    {
+        "FASE 3 — O Berimbau",
+        "assets/fase3.mp3",
+        "Nacao Zumbi",
+        "O Berimbau da Nacao Zumbi e uma releitura que homenageia o instrumento mais emblematico da capoeira, "
+        "originario da Africa e trazido ao Brasil pelos escravizados. A banda transforma o toque tradicional "
+        "em peso e distorcao, unindo raiz africana ao rock pernambucano de forma visceral."
+    },
 };
 
 typedef struct { int coluna; float tempo; } EventoNota;
