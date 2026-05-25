@@ -66,12 +66,20 @@ static int DesenharBotao(const char *texto, int y, int selecionado) {
     return (hover && IsMouseButtonPressed(MOUSE_LEFT_BUTTON));
 }
 
-static void DesenharJogo(EstadoJogo *estado) {
+static void DesenharJogo(EstadoJogo *estado, Texture2D fundo_jogo) {
+    int sw = GetScreenWidth();
     int sh = GetScreenHeight();
+
+    if (fundo_jogo.id > 0) {
+        Rectangle src = {0, 0, fundo_jogo.width, fundo_jogo.height};
+        Rectangle dst = {0, 0, sw, sh};
+        DrawTexturePro(fundo_jogo, src, dst, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+    DrawRectangle(0, 0, sw, sh, (Color){10, 5, 25, 155});
 
     for (int i = 0; i < NUM_COLUNAS; i++) {
         int lx = LANE_X_START + i * LANE_W;
-        DrawRectangle(lx, 0, LANE_W, sh, (Color){20, 15, 35, 255});
+        DrawRectangle(lx, 0, LANE_W, sh, (Color){20, 15, 35, 190});
         DrawLine(lx, 0, lx, sh, (Color){50, 45, 70, 255});
     }
     DrawLine(LANE_X_START + NUM_COLUNAS * LANE_W, 0,
@@ -352,8 +360,9 @@ int main(void) {
     SetTargetFPS(60);
     InitAudioDevice();
 
-    Texture2D fundo  = LoadTexture("assets/fundo.png");
-    Music     musica = CarregarMusicaFase(0);
+    Texture2D fundo       = LoadTexture("assets/fundo.png");
+    Texture2D fundo_jogo  = LoadTexture("assets/fundo_jogo.png");
+    Music     musica      = CarregarMusicaFase(0);
 
     TelaAtual tela    = TELA_MENU;
     OpcaoMenu selecao = OPCAO_JOGAR;
@@ -536,7 +545,7 @@ int main(void) {
                 545, 14, COR_CINZA);
 
         } else if (tela == TELA_JOGO) {
-            DesenharJogo(&jogo);
+            DesenharJogo(&jogo, fundo_jogo);
             if (jogoEmPausa) {
                 int acao = DesenharPausa(selecaoPausa);
                 if (acao == 0) {
@@ -569,6 +578,7 @@ int main(void) {
     if (jogoVivo) encerrarJogo(&jogo);
     UnloadMusicStream(musica);
     UnloadTexture(fundo);
+    UnloadTexture(fundo_jogo);
     CloseAudioDevice();
     CloseWindow();
     return 0;
