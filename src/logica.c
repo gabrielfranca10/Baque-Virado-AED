@@ -1,4 +1,5 @@
 #include "logica.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 const InfoFase FASES[TOTAL_FASES] = {
@@ -384,11 +385,13 @@ void atualizarJogo(EstadoJogo *estado, float dt) {
 void calcularPontuacao(EstadoJogo *estado, TipoAcerto resultado) {
     if (resultado == ACERTO_PERFEITO) {
         estado->combo++;
-        int mult = estado->combo > 8 ? 8 : estado->combo;
+        int mult = estado->combo;
+        if (mult > 8) mult = 8;
         estado->pontuacao += 100 * mult;
     } else if (resultado == ACERTO_BOM) {
         estado->combo++;
-        int mult = estado->combo > 8 ? 8 : estado->combo;
+        int mult = estado->combo;
+        if (mult > 8) mult = 8;
         estado->pontuacao += 50 * mult;
     } else {
         estado->combo = 0;
@@ -406,7 +409,11 @@ TipoAcerto verificarAcerto(EstadoJogo *estado, int coluna) {
     float dist = estado->colunas[coluna].cabeca->y - (float)LINHA_ACERTO;
     if (dist < 0.0f) dist = -dist;
 
-    float janela = (estado->faseAtual == 2) ? (float)JANELA_ACERTO_F3 : (float)JANELA_ACERTO;
+    float janela;
+    if (estado->faseAtual == 2)
+        janela = (float)JANELA_ACERTO_F3;
+    else
+        janela = (float)JANELA_ACERTO;
     TipoAcerto resultado;
 
     if (dist <= janela * 0.4f)
@@ -463,4 +470,21 @@ void adicionarScore(EntradaRanking *ranking, int *n, int pontuacao) {
         return;
     }
     ordenarRanking(ranking, *n);
+}
+
+void salvarRanking(EntradaRanking *ranking, int n) {
+    FILE *f = fopen("ranking.txt", "w");
+    if (!f) return;
+    for (int i = 0; i < n; i++)
+        fprintf(f, "%d\n", ranking[i].pontuacao);
+    fclose(f);
+}
+
+void carregarRanking(EntradaRanking *ranking, int *n) {
+    *n = 0;
+    FILE *f = fopen("ranking.txt", "r");
+    if (!f) return;
+    while (*n < MAX_RANKING && fscanf(f, "%d", &ranking[*n].pontuacao) == 1)
+        (*n)++;
+    fclose(f);
 }

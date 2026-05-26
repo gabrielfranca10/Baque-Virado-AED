@@ -13,6 +13,10 @@ Jogo desenvolvido para a disciplina de **Algoritmos e Estrutura de Dados**.
 
 <!-- Adicione aqui o vídeo do jogo rodando -->
 
+**Video no YouTube:** [Assistir](<!-- cole aqui o link do YouTube -->)
+
+**Slides da apresentação:** [Ver slides](<!-- cole aqui o link do slide -->)
+
 ---
 
 ## Dependências
@@ -20,14 +24,6 @@ Jogo desenvolvido para a disciplina de **Algoritmos e Estrutura de Dados**.
 - [Raylib](https://www.raylib.com/)
 - [libcurl](https://curl.se/libcurl/)
 - gcc, make
-
-### Instalando dependências no Ubuntu/Debian
-
-```bash
-sudo apt install gcc make libcurl4-openssl-dev
-```
-
-Para instalar o Raylib, siga as instruções em: https://github.com/raysan5/raylib
 
 ---
 
@@ -39,18 +35,58 @@ git clone https://github.com/gabrielfranca10/Baque-Virado-AED.git
 cd Baque-Virado-AED
 ```
 
-**2. Compile e execute:**
+---
+
+### Linux (Ubuntu/Debian)
+
+**Instalar dependências:**
+```bash
+sudo apt install gcc make libcurl4-openssl-dev
+```
+
+Instale o Raylib seguindo: https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux
+
+**Compilar e executar:**
 ```bash
 make run
 ```
 
-Ou, separadamente:
+---
+
+### Windows
+
+**Pré-requisitos:**
+- Instale o [MSYS2](https://www.msys2.org/)
+- Abra o terminal **MSYS2 MinGW 64-bit** e rode:
+
 ```bash
-make        # compila
-./baque-virado  # executa
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-raylib mingw-w64-x86_64-curl
 ```
 
-**3. Para limpar os arquivos compilados:**
+**Compilar e executar:**
+```bash
+make run
+```
+
+---
+
+### macOS
+
+**Instalar dependências via Homebrew:**
+```bash
+brew install raylib curl
+```
+
+Se não tiver o Homebrew: https://brew.sh
+
+**Compilar e executar:**
+```bash
+make run
+```
+
+---
+
+**Para limpar os arquivos compilados:**
 ```bash
 make clean
 ```

@@ -377,6 +377,7 @@ int main(void) {
     int            faseAtual      = 0;
     EntradaRanking ranking[MAX_RANKING] = {0};
     int            numScores            = 0;
+    carregarRanking(ranking, &numScores);
     char           loreFase[1024]       = {0};
 
     while (!WindowShouldClose()) {
@@ -467,6 +468,7 @@ int main(void) {
                         ResumeMusicStream(musica);
                     } else {
                         adicionarScore(ranking, &numScores, jogo.pontuacao);
+                        salvarRanking(ranking, numScores);
                         encerrarJogo(&jogo);
                         StopMusicStream(musica);
                         jogoVivo = jogoEmPausa = selecaoPausa = 0;
@@ -486,6 +488,7 @@ int main(void) {
                     StopMusicStream(musica);
                     pontuacaoFinal = jogo.pontuacao;
                     adicionarScore(ranking, &numScores, pontuacaoFinal);
+                    salvarRanking(ranking, numScores);
                     encerrarJogo(&jogo);
                     jogoVivo = 0;
                     if (faseAtual == TOTAL_FASES - 1) {
@@ -553,6 +556,7 @@ int main(void) {
                     ResumeMusicStream(musica);
                 } else if (acao == 1) {
                     adicionarScore(ranking, &numScores, jogo.pontuacao);
+                    salvarRanking(ranking, numScores);
                     encerrarJogo(&jogo);
                     StopMusicStream(musica);
                     jogoVivo = jogoEmPausa = selecaoPausa = 0;
