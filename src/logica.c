@@ -381,6 +381,20 @@ void atualizarJogo(EstadoJogo *estado, float dt) {
     }
 }
 
+void calcularPontuacao(EstadoJogo *estado, TipoAcerto resultado) {
+    if (resultado == ACERTO_PERFEITO) {
+        estado->combo++;
+        int mult = estado->combo > 8 ? 8 : estado->combo;
+        estado->pontuacao += 100 * mult;
+    } else if (resultado == ACERTO_BOM) {
+        estado->combo++;
+        int mult = estado->combo > 8 ? 8 : estado->combo;
+        estado->pontuacao += 50 * mult;
+    } else {
+        estado->combo = 0;
+    }
+}
+
 TipoAcerto verificarAcerto(EstadoJogo *estado, int coluna) {
     if (listaVazia(&estado->colunas[coluna])) {
         estado->combo = 0;
@@ -392,38 +406,21 @@ TipoAcerto verificarAcerto(EstadoJogo *estado, int coluna) {
     float dist = estado->colunas[coluna].cabeca->y - (float)LINHA_ACERTO;
     if (dist < 0.0f) dist = -dist;
 
-    float janela;
-    if (estado->faseAtual == 2)
-        janela = (float)JANELA_ACERTO_F3;
-    else
-        janela = (float)JANELA_ACERTO;
+    float janela = (estado->faseAtual == 2) ? (float)JANELA_ACERTO_F3 : (float)JANELA_ACERTO;
     TipoAcerto resultado;
 
-    if (dist <= janela * 0.4f) {
+    if (dist <= janela * 0.4f)
         resultado = ACERTO_PERFEITO;
-        estado->combo++;
-        int mult;
-        if (estado->combo > 8)
-            mult = 8;
-        else
-            mult = estado->combo;
-        estado->pontuacao += 100 * mult;
-    } else if (dist <= janela) {
+    else if (dist <= janela)
         resultado = ACERTO_BOM;
-        estado->combo++;
-        int mult;
-        if (estado->combo > 8)
-            mult = 8;
-        else
-            mult = estado->combo;
-        estado->pontuacao += 50 * mult;
-    } else {
+    else {
         estado->combo = 0;
         estado->ultimoAcerto[coluna]  = ACERTO_ERROU;
         estado->tempoFeedback[coluna] = FEEDBACK_DURACAO;
         return ACERTO_ERROU;
     }
 
+    calcularPontuacao(estado, resultado);
     removerNota(&estado->colunas[coluna]);
     estado->ultimoAcerto[coluna]  = resultado;
     estado->tempoFeedback[coluna] = FEEDBACK_DURACAO;

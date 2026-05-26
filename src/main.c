@@ -492,7 +492,7 @@ int main(void) {
                         tela = TELA_ENCERRADO;
                     } else {
                         loreFase[0] = '\0';
-                        buscarLoreGemini(FASES[faseAtual].titulo, FASES[faseAtual].artista,
+                        chamarGemini(FASES[faseAtual].titulo, FASES[faseAtual].artista,
                                          FASES[faseAtual].lore, loreFase, sizeof(loreFase));
                         tela = TELA_PONTUACAO;
                     }

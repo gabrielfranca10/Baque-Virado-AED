@@ -64,7 +64,7 @@ static void extrairTexto(const char *json, const char *fallback, char *out, int 
     out[i] = '\0';
 }
 
-void buscarLoreGemini(const char *titulo, const char *artista, const char *fallback, char *out, int tamanho) {
+void chamarGemini(const char *titulo, const char *artista, const char *fallback, char *out, int tamanho) {
     const char *key = getenv("GEMINI_API_KEY");
     if (!key) {
         if (fallback) {

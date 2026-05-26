@@ -48,12 +48,13 @@ typedef struct {
     int pontuacao;
 } EntradaRanking;
 
-void       iniciarJogo    (EstadoJogo *estado, int fase);
-void       atualizarJogo  (EstadoJogo *estado, float dt);
-TipoAcerto verificarAcerto(EstadoJogo *estado, int coluna);
-void       encerrarJogo   (EstadoJogo *estado);
-int        faseConcluida  (const EstadoJogo *estado);
-void       ordenarRanking (EntradaRanking *ranking, int n);
-void       adicionarScore (EntradaRanking *ranking, int *n, int pontuacao);
+void       iniciarJogo       (EstadoJogo *estado, int fase);
+void       atualizarJogo     (EstadoJogo *estado, float dt);
+TipoAcerto verificarAcerto   (EstadoJogo *estado, int coluna);
+void       calcularPontuacao (EstadoJogo *estado, TipoAcerto resultado);
+void       encerrarJogo      (EstadoJogo *estado);
+int        faseConcluida     (const EstadoJogo *estado);
+void       ordenarRanking    (EntradaRanking *ranking, int n);
+void       adicionarScore    (EntradaRanking *ranking, int *n, int pontuacao);
 
 #endif
