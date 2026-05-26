@@ -13,10 +13,9 @@ Jogo desenvolvido para a disciplina de **Algoritmos e Estrutura de Dados**.
 
 <!-- Adicione aqui o vídeo do jogo rodando -->
 
-**Video no YouTube:** [Assistir]([(https://youtu.be/Qtre8Q7bIlw))
+**Vídeo no YouTube:** [Assistir](https://youtu.be/Qtre8Q7bIlw)
 
-**Slides da apresentação:** [Ver slides](<!-- cole aqui o link do slide -->)
-
+**Slides da apresentação:** [Ver slides](https://canva.link/qpesdstooek012v)
 ---
 
 ## Dependências
