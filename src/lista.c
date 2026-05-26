@@ -7,7 +7,7 @@ Lista criarLista(void) {
 
 void inserirNota(Lista *lista, float y) {
     Nota *novo = malloc(sizeof(Nota));
-    novo->y    = y;
+    novo->y = y;
     novo->prox = NULL;
 
     if (!lista->cabeca) {

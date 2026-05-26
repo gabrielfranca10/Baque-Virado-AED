@@ -1,6 +1,7 @@
 #include "logica.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 const InfoFase FASES[TOTAL_FASES] = {
     {
@@ -460,12 +461,16 @@ void ordenarRanking(EntradaRanking *ranking, int n) {
     }
 }
 
-void adicionarScore(EntradaRanking *ranking, int *n, int pontuacao) {
+void adicionarScore(EntradaRanking *ranking, int *n, int pontuacao, const char *nome) {
     if (pontuacao <= 0) return;
+    EntradaRanking entrada = {0};
+    entrada.pontuacao = pontuacao;
+    if (nome && nome[0])
+        strncpy(entrada.nome, nome, MAX_NOME);
     if (*n < MAX_RANKING) {
-        ranking[(*n)++].pontuacao = pontuacao;
+        ranking[(*n)++] = entrada;
     } else if (pontuacao > ranking[*n - 1].pontuacao) {
-        ranking[*n - 1].pontuacao = pontuacao;
+        ranking[*n - 1] = entrada;
     } else {
         return;
     }
@@ -476,7 +481,7 @@ void salvarRanking(EntradaRanking *ranking, int n) {
     FILE *f = fopen("ranking.txt", "w");
     if (!f) return;
     for (int i = 0; i < n; i++)
-        fprintf(f, "%d\n", ranking[i].pontuacao);
+        fprintf(f, "%d|%s\n", ranking[i].pontuacao, ranking[i].nome);
     fclose(f);
 }
 
@@ -484,7 +489,16 @@ void carregarRanking(EntradaRanking *ranking, int *n) {
     *n = 0;
     FILE *f = fopen("ranking.txt", "r");
     if (!f) return;
-    while (*n < MAX_RANKING && fscanf(f, "%d", &ranking[*n].pontuacao) == 1)
-        (*n)++;
+    char linha[64];
+    while (*n < MAX_RANKING && fgets(linha, sizeof(linha), f)) {
+        int  pts  = 0;
+        char nome[MAX_NOME + 1] = {0};
+        sscanf(linha, "%d|%18[^\n]", &pts, nome);
+        if (pts > 0) {
+            ranking[*n].pontuacao = pts;
+            strncpy(ranking[*n].nome, nome, MAX_NOME);
+            (*n)++;
+        }
+    }
     fclose(f);
 }

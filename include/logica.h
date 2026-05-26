@@ -44,8 +44,10 @@ typedef struct {
 } EstadoJogo;
 
 #define MAX_RANKING 10
+#define MAX_NOME    18
 typedef struct {
-    int pontuacao;
+    int  pontuacao;
+    char nome[MAX_NOME + 1];
 } EntradaRanking;
 
 void       iniciarJogo       (EstadoJogo *estado, int fase);
@@ -55,7 +57,7 @@ void       calcularPontuacao (EstadoJogo *estado, TipoAcerto resultado);
 void       encerrarJogo      (EstadoJogo *estado);
 int        faseConcluida     (const EstadoJogo *estado);
 void       ordenarRanking    (EntradaRanking *ranking, int n);
-void       adicionarScore    (EntradaRanking *ranking, int *n, int pontuacao);
+void       adicionarScore    (EntradaRanking *ranking, int *n, int pontuacao, const char *nome);
 void       salvarRanking     (EntradaRanking *ranking, int n);
 void       carregarRanking   (EntradaRanking *ranking, int *n);
 
