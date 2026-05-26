@@ -13,7 +13,7 @@ Jogo desenvolvido para a disciplina de **Algoritmos e Estrutura de Dados**.
 
 <!-- Adicione aqui o vídeo do jogo rodando -->
 
-**Video no YouTube:** [Assistir](<!-- cole aqui o link do YouTube -->)
+**Video no YouTube:** [Assistir]([(https://youtu.be/Qtre8Q7bIlw))
 
 **Slides da apresentação:** [Ver slides](<!-- cole aqui o link do slide -->)
 
